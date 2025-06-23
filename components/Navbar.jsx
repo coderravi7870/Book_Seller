@@ -37,7 +37,7 @@ const Navbar = () => {
             onClick={() => router.push("/seller")}
             className="text-xs border px-4 py-1.5 rounded-full"
           >
-            Vendor Dashboard
+            Become a Seller
           </button>
         )}
       </div>
@@ -80,7 +80,7 @@ const Navbar = () => {
             onClick={() => router.push("/seller")}
             className="text-xs border px-4 py-1.5 rounded-full"
           >
-            Vendor Dashboard
+            Become a Seller
           </button>
         )}
         {user ? (
