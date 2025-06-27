@@ -34,6 +34,7 @@ export async function POST(request) {
         if(!files || files.length === 0){
             return NextResponse.json({success: false, message: "no files uploaded"});
         }
+        console.log("1Ram Ram");
 
         const result = await Promise.all(
             files.map(async (file)=>{
@@ -53,6 +54,8 @@ export async function POST(request) {
                 })
             })
         );
+
+        console.log("2Ram Ram");
 
         const image = result.map(result=> result.secure_url);
 

@@ -1,7 +1,9 @@
 import { addressDummyData } from "@/assets/assets";
 import { useAppContext } from "@/context/AppContext";
 import axios from "axios";
+import { Loader2Icon } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 const OrderSummary = () => {
   const {
@@ -18,6 +20,8 @@ const OrderSummary = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const [userAddresses, setUserAddresses] = useState([]);
+
+  const [isLoading,setIsLoading] = useState(false);
 
   const fetchUserAddresses = async () => {
     try {
@@ -44,7 +48,51 @@ const OrderSummary = () => {
     setIsDropdownOpen(false);
   };
 
-  const createOrder = async () => {};
+  const createOrder = async () => {
+    try {
+      if (!selectedAddress) {
+        return toast.error("Please select an address");
+      }
+
+      let cartItemsArray = Object.keys(cartItems).map((key) => ({
+        product: key,
+        quantity: cartItems[key],
+      }));
+
+      // console.log(cartItemsArray);
+
+      cartItemsArray = cartItemsArray.filter((item) => item.quantity > 0);
+      console.log(cartItemsArray);
+
+      if (cartItemsArray.length === 0) {
+        return toast.error("Cart is empty");
+      }
+
+      const token = await getToken();
+
+      setIsLoading(true);
+      const { data } = await axios.post(
+        "/api/order/create",
+        {
+          address: selectedAddress,
+          items: cartItemsArray,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (data.success) {
+        toast.success(data.message);
+        setCartItems({});
+        router.push('/order-placed');
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }finally{
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (user) {
@@ -124,7 +172,7 @@ const OrderSummary = () => {
               placeholder="Enter promo code"
               className="flex-grow w-full outline-none p-2.5 text-gray-600 border"
             />
-            <button className="bg-orange-600 text-white px-9 py-2 hover:bg-orange-700">
+            <button className="bg-blue-600 text-white px-9 py-2 hover:bg-blue-700">
               Apply
             </button>
           </div>
@@ -163,9 +211,10 @@ const OrderSummary = () => {
 
       <button
         onClick={createOrder}
-        className="w-full bg-orange-600 text-white py-3 mt-5 hover:bg-orange-700"
+        className="w-full bg-blue-600 text-white py-3 mt-5 hover:bg-blue-700 flex items-center justify-center"
       >
-        Place Order
+        {isLoading && <Loader2Icon className="animate-spin w-4 h-4"/>}
+        <span>Place Order</span>
       </button>
     </div>
   );

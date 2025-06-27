@@ -19,12 +19,15 @@ export const AppContextProvider = ({ children }) => {
   const { user } = useUser();
   const { getToken } = useAuth();
 
+
+
   //   console.log(user)
 
   const [products, setProducts] = useState([]);
   const [userData, setUserData] = useState(false);
   const [isSeller, setIsSeller] = useState(false);
   const [cartItems, setCartItems] = useState({});
+  const [addToCardLoader, setAddToCardLoader] = useState(false);
 
   const fetchProductData = async () => {
     try {
@@ -38,7 +41,6 @@ export const AppContextProvider = ({ children }) => {
     } catch (error) {
       toast.error(error.message);
     }
-    // setProducts(productsDummyData);
   };
 
   const fetchUserData = async () => {
@@ -60,8 +62,6 @@ export const AppContextProvider = ({ children }) => {
       } else {
         toast.error(data.message);
       }
-
-      //   setUserData(userDummyData);
     } catch (error) {
       toast.error(error.message);
     }
@@ -80,6 +80,7 @@ export const AppContextProvider = ({ children }) => {
     if (user) {
       try {
         const token = await getToken();
+        setAddToCardLoader(true)
 
         const { data } = await axios.post(
           '/api/cart/update',
@@ -89,6 +90,8 @@ export const AppContextProvider = ({ children }) => {
         toast.success("Item added to cart");
       } catch (error) {
         toast.error(error.message);
+      }finally{
+        setAddToCardLoader(false);
       }
     }
   };
@@ -166,6 +169,7 @@ export const AppContextProvider = ({ children }) => {
     getCartAmount,
     user,
     getToken,
+    addToCardLoader
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
