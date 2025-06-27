@@ -7,9 +7,12 @@ import { useState } from "react";
 import { useAppContext } from "@/context/AppContext";
 import toast from "react-hot-toast";
 import axios from "axios";
+import { Loader2Icon } from "lucide-react";
 
 const AddAddress = () => {
   const { router, getToken } = useAppContext();
+
+  const [loading,setLoading] = useState(false);
 
   const [address, setAddress] = useState({
     fullName: "",
@@ -26,6 +29,7 @@ const AddAddress = () => {
     try {
       const token = await getToken();
 
+      setLoading(true);
       const { data } = await axios.post(
         "/api/user/add-address",
         { address },
@@ -42,6 +46,8 @@ const AddAddress = () => {
       }
     } catch (error) {
       toast.error(error.message);
+    }finally{
+      setLoading(false);
     }
   };
 
@@ -52,11 +58,11 @@ const AddAddress = () => {
         <form onSubmit={onSubmitHandler} className="w-full">
           <p className="text-2xl md:text-3xl text-gray-500">
             Add Shipping{" "}
-            <span className="font-semibold text-orange-600">Address</span>
+            <span className="font-semibold text-blue-600">Address</span>
           </p>
           <div className="space-y-3 max-w-sm mt-10">
             <input
-              className="px-2 py-2.5 focus:border-orange-500 transition border border-gray-500/30 rounded outline-none w-full text-gray-500"
+              className="px-2 py-2.5 focus:border-blue-500 transition border border-gray-500/30 rounded outline-none w-full text-gray-500"
               type="text"
               placeholder="Full name"
               onChange={(e) =>
@@ -113,9 +119,10 @@ const AddAddress = () => {
           </div>
           <button
             type="submit"
-            className="max-w-sm w-full mt-6 bg-orange-600 text-white py-3 hover:bg-orange-700 uppercase"
+            className="max-w-sm w-full mt-6 bg-blue-600 text-white py-3 hover:bg-blue-700 uppercase flex justify-center items-center gap-2"
           >
-            Save address
+            {loading && <Loader2Icon className="animate-spin w-5 h-5"/>}
+            <span>Save address</span>
           </button>
         </form>
 
